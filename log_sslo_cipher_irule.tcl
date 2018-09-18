@@ -1,6 +1,6 @@
 #**
 #** Name   : log_sslo_cipher_irule
-#** Author : Brett Smith, <brett-at-f5>
+#** Author : brett-at-f5
 #** Description: Log Client and Server Cipher Version and Name on transparent SSL/TLS forward proxy Virtual Servers
 #**
 
