@@ -1,6 +1,6 @@
 #**
 #** Name: extract_upn_apm_event_irule
-#** Author: brett-at-f5
+#** Author: devcentral.f5.com
 #** Description: This iRule will Extract the User Principal Name (UPN) from a x.509 client certificate extension.
 #**
 
