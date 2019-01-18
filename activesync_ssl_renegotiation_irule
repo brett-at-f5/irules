@@ -1,0 +1,52 @@
+#
+# APM Microsoft ActiveSync SSL Renegotiation iRule
+# forces client certificate renegotiation for activesync
+# v1.0
+#
+# Author: James Deucker
+# Copyright (c) 2014 F5 Networks
+#
+
+# this iRule assumes a clientssl profile has been attached
+# with the client certificate set to ignore
+# but the correct bundles to verify the certificate is valid
+
+# these static vars come from the system supplied _sys_APM_activesync iRule initialisation
+# if an upgrade does not contain the iRule or is renamed then uncomment this event
+#when RULE_INIT priority 900 {
+#    set static::ACCESS_LOG_PREFIX       "01490000:7:"
+#}
+
+when CLIENT_ACCEPTED priority 100 {
+    # flag that we are not required to renegotiate yet
+    set ssl_renegotiate 0
+}
+
+when HTTP_REQUEST priority 100 {
+    # if there is no client cert and the activesync URI is hit then force a renegotiation
+    if {[SSL::cert count] == 0 && [string tolower [HTTP::uri]] starts_with "/microsoft-server-activesync"} {
+        # buffer this HTTP request while waiting for the renegotiation
+        # this will park this iRule event and give the SSL layer a chance to complete
+        HTTP::collect
+
+        # require a client cert
+        SSL::cert mode require
+        # force a renegotiation
+        SSL::renegotiate
+        # flag to the CLIENTSSL_HANDSHAKE that we're renegotiating
+        set ssl_renegotiate 1
+    }
+}
+
+when CLIENTSSL_HANDSHAKE priority 100 {
+    if { $ssl_renegotiate } {
+        if { [SSL::cert count] != 0 } {
+            log -noname accesscontrol.local1.debug "$static::ACCESS_LOG_PREFIX client SSL certificate renegotiated"
+            # we've completed the renegotiation so release the HTTP request
+            HTTP::release
+        } else {
+            # no certificate was received
+            log -noname accesscontrol.local1.debug "$static::ACCESS_LOG_PREFIX a valid client SSL certificate was not presented in the renegotiation"
+        }
+    }
+}
