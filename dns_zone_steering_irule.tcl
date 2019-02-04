@@ -34,7 +34,6 @@ when DNS_RESPONSE {
 }
 
 ##** Example Data Group
-##**
 
 # ltm data-group internal dns_zone_pool_mapping_dg {
 #  records {
