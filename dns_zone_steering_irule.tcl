@@ -1,7 +1,7 @@
 #**
 #** Name: dns_zone_steering_irule
 #** Author: brett-at-f5
-#** Description: This iRule will select a DNS server pool based on the Zone Name
+#** Description: This iRule will select a DNS server pool based on the Zone Name. The pool name is stored in data group.
 #**
 
 when RULE_INIT {
@@ -32,3 +32,18 @@ when DNS_REQUEST {
 when DNS_RESPONSE {
   if { $static::debug_dns_steering >= 2 } { log local0. "Client IP: [IP::client_addr], Answer: [DNS::answer], RCODE: [DNS::header rcode], Query ID: [DNS::header id], DNS Server: [LB::server addr]" }
 }
+
+##** Example Data Group
+##**
+
+# ltm data-group internal dns_zone_pool_mapping_dg {
+#  records {
+#    1.1.10.in-addr.arpa {
+#      data f5.demo_dns_pool
+#    }
+#    f5.demo {
+#      data f5.demo_dns_pool
+#    }
+#  }
+#  type string
+#}
