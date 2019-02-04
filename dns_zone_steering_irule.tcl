@@ -5,7 +5,7 @@
 #**
 
 when RULE_INIT {
- 	# DNS Zone to DNS Pool mapping
+  # DNS Zone to DNS Pool mapping
 	set static::dns_zone_pool_mapping_dg "dns_zone_pool_mapping_dg"
 
 	# Debug logging control
@@ -25,10 +25,10 @@ when DNS_REQUEST {
 		if { $static::debug_dns_steering >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], Query ID: [DNS::header id],Pool: $dns_pool" }
 		pool $dns_pool
 	} else {
-	    if { $static::debug_dns_steering >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], Query ID: [DNS::header id], Pool: $default_pool" }
+	  if { $static::debug_dns_steering >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], Query ID: [DNS::header id], Pool: $default_pool" }
 	}
 }
 
 when DNS_RESPONSE {
-	if { $static::debug_dns_steering >= 2 } { log local0. "Client IP: [IP::client_addr], Answer: [DNS::answer], RCODE: [DNS::header rcode], Query ID: [DNS::header id], DNS Server: [LB::server addr]" }
+  if { $static::debug_dns_steering >= 2 } { log local0. "Client IP: [IP::client_addr], Answer: [DNS::answer], RCODE: [DNS::header rcode], Query ID: [DNS::header id], DNS Server: [LB::server addr]" }
 }
