@@ -22,7 +22,7 @@ when DNS_REQUEST {
   # If the Zone Name in the data group matches the Question Name, send the request to the Pool specified in data group
   if { [class match [DNS::question name] ends_with $static::dns_zone_pool_mapping_dg] } {
     set dns_pool [class match -value [DNS::question name] ends_with $static::dns_zone_pool_mapping_dg]
-    if { $static::debug_dns_steering >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], Query ID: [DNS::header id],Pool: $dns_pool" }
+    if { $static::debug_dns_steering >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], Query ID: [DNS::header id], Pool: $dns_pool" }
     pool $dns_pool
   } else {
     if { $static::debug_dns_steering >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], Query ID: [DNS::header id], Pool: $default_pool" }
