@@ -1,7 +1,7 @@
 #**
 #** Name: dns_zone_steering_irule
 #** Author: brett-at-f5
-#** Description: https://devcentral.f5.com/articles/dns-interception-protecting-the-client
+#** Description: This iRule will select a DNS server pool based on the Zone Name
 #**
 
 when RULE_INIT {
