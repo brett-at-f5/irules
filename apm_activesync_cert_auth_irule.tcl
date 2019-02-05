@@ -43,8 +43,8 @@ when HTTP_REQUEST priority 200 {
     # According to the MSDN site, the ActiveSync request format is:
     # POST /Microsoft-Server-ActiveSync?Cmd=FolderSync&User=fakename&DeviceId=v140Device&DeviceType=SmartPhone
 
-    set user [URL::query [HTTP::uri] User]
-    set deviceid [URL::query [HTTP::uri] DeviceId]
+    set user [URI::query [HTTP::uri] User]
+    set deviceid [URI::query [HTTP::uri] DeviceId]
 
     binary scan [md5 "$user$deviceid"] H* user_key
 
