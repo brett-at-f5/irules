@@ -23,106 +23,106 @@
 # 1. Logging Control - Off, Level 1 (NXDOMAIN and Whitelist Matching) and Level 2 (All DNS Requests & Responses)
  
 when RULE_INIT {
-	# DNS Request filtering - URL DB control.
-	# 0 = DNS Request filter off, 1 = DNS Request filter on.
-	set static::dns_request_filter 1
-	# URL categories data group. Any categories (Bot_Networks, etc) in this DG will be blocked based on the DNS question name.
-	set static::dns_request_url_categories_dg "dns_request_url_categories_dg"
-	# DNS request questions type data group. Question types (A,AAAA,etc) in the DNS request that match the DG will be sent for URL category filtering.
-	set static::dns_request_question_type_dg "dns_request_question_type_dg"
-	# FQDN whitelist data group. Any FQDN/Domain in this DG will bypass DNS request URL category filtering.
-	set static::dns_request_fqdn_whitelist_dg "dns_request_fqdn_whitelist_dg"
+  # DNS Request filtering - URL DB control.
+  # 0 = DNS Request filter off, 1 = DNS Request filter on.
+  set static::dns_request_filter 1
+  # URL categories data group. Any categories (Bot_Networks, etc) in this DG will be blocked based on the DNS question name.
+  set static::dns_request_url_categories_dg "dns_request_url_categories_dg"
+  # DNS request questions type data group. Question types (A,AAAA,etc) in the DNS request that match the DG will be sent for URL category filtering.
+  set static::dns_request_question_type_dg "dns_request_question_type_dg"
+  # FQDN whitelist data group. Any FQDN/Domain in this DG will bypass DNS request URL category filtering.
+  set static::dns_request_fqdn_whitelist_dg "dns_request_fqdn_whitelist_dg"
  
-	# DNS Response filtering - IP intelligence (reputation) control.
-	# 0 = DNS Response filter off, 1 = DNS Response filter on.
-	set static::dns_response_filter 1
-	# IP address whitelist data group. Any IP or IP Subnet in this DG will bypass DNS response filtering regardless of the IP intelligence (reputation) value.
-	# If a AAAA record is contained in the Resource Record (RR), it is also returned in the DNS response.
-	set static::dns_response_ip4_whitelist_dg "dns_response_ip_whitelist_dg"
-	# IP intelligence categories data group. If the DNS RDATA (A & AAAA only) matches a category in the data group, NXDOMAIN will be returned in the response.
-	set static::dns_response_ipi_categories_dg "dns_response_ipi_categories_dg"
+  # DNS Response filtering - IP intelligence (reputation) control.
+  # 0 = DNS Response filter off, 1 = DNS Response filter on.
+  set static::dns_response_filter 1
+  # IP address whitelist data group. Any IP or IP Subnet in this DG will bypass DNS response filtering regardless of the IP intelligence (reputation) value.
+  # If a AAAA record is contained in the Resource Record (RR), it is also returned in the DNS response.
+  set static::dns_response_ip4_whitelist_dg "dns_response_ip_whitelist_dg"
+  # IP intelligence categories data group. If the DNS RDATA (A & AAAA only) matches a category in the data group, NXDOMAIN will be returned in the response.
+  set static::dns_response_ipi_categories_dg "dns_response_ipi_categories_dg"
  
-	# Debug logging control.
-	# 0 = logging off, 1 = informational logging, 2 = debug logging
-	set static::debug_dns 2
+  # Debug logging control.
+  # 0 = logging off, 1 = informational logging, 2 = debug logging
+  set static::debug_dns 2
 }
  
 when DNS_REQUEST {
-	if { $static::debug_dns >= 2 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type]" }
+  if { $static::debug_dns >= 2 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type]" }
  
-	# If DNS Request filtering is enabled, filter the request.
-	if { $static::dns_request_filter } {
-		# If the Question Name (eg. f5.com) is in the Whitelist, bypass URL filtering.
-		if { ![class match [DNS::question name] ends_with $static::dns_request_fqdn_whitelist_dg] } {
-			# If the Question Type matches, filter the request.
-			if { [class match [DNS::question type] equals $static::dns_request_question_type_dg] } {
-				# Determine the URL Category for the Question Name.
-				set url_category [lindex [CATEGORY::lookup http://[DNS::question name]] 0]
-				# If the URL Category is matched, return NXDOMAIN to the client.
-				if { [class match $url_category ends_with $static::dns_request_url_categories_dg] } {
-					# URL Category matched - Log.
-					if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], URL Category: $url_category - Respond with NXDOMAIN" }
-					# Return NXDOMAIN to the client.
-					DNS::answer clear
-					DNS::header opcode QUERY
-					DNS::header rcode NXDOMAIN
-					DNS::return
-				}
-			}
-		} else {
-			# FQDN/TLD Whitelist matched - Log.
-			if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], FQDN/TLD Whitelist: Match Found - Bypass Request Filtering" }
-		}
-	}
+  # If DNS Request filtering is enabled, filter the request.
+  if { $static::dns_request_filter } {
+    # If the Question Name (eg. f5.com) is in the Whitelist, bypass URL filtering.
+    if { ![class match [DNS::question name] ends_with $static::dns_request_fqdn_whitelist_dg] } {
+      # If the Question Type matches, filter the request.
+      if { [class match [DNS::question type] equals $static::dns_request_question_type_dg] } {
+        # Determine the URL Category for the Question Name.
+        set url_category [lindex [CATEGORY::lookup http://[DNS::question name]] 0]
+        # If the URL Category is matched, return NXDOMAIN to the client.
+        if { [class match $url_category ends_with $static::dns_request_url_categories_dg] } {
+          # URL Category matched - Log.
+          if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], URL Category: $url_category - Respond with NXDOMAIN" }
+          # Return NXDOMAIN to the client.
+          DNS::answer clear
+          DNS::header opcode QUERY
+          DNS::header rcode NXDOMAIN
+          DNS::return
+        }
+      }
+    } else {
+      # FQDN/TLD Whitelist matched - Log.
+      if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], FQDN/TLD Whitelist: Match Found - Bypass Request Filtering" }
+    }
+  }
 }
  
 when DNS_RESPONSE {
-	# If Response Filter is enabled, filter the response.
-	if { $static::dns_response_filter } {
+  # If Response Filter is enabled, filter the response.
+  if { $static::dns_response_filter } {
  
-		set threat_categories ""
+    set threat_categories ""
  
-		if { [DNS::ptype] eq "ANSWER" } {
-			# Loop through each Resource Record(s).
-			foreach rr [DNS::answer] {
-				switch [DNS::type $rr] {
-					"A" {
-						# If the IP is not in the whitelist, filter the response.
-						if { ![class match [DNS::rdata $rr] equals $static::dns_response_ip4_whitelist_dg] } {
-							set threat_categories [IP::reputation [DNS::rdata $rr]]
-							# If a Threat Category is returned and matches, filter the request.
-							if { [class match $threat_categories contains $static::dns_response_ipi_categories_dg] } {
-								# Threat Category matched - Log.
-								if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: A, Threat Category: $threat_categories - Respond with NXDOMAIN" }
-								# Return NXDOMAIN to the client.
-								DNS::answer clear
-								DNS::header opcode QUERY
-								DNS::header rcode NXDOMAIN
-							}
+    if { [DNS::ptype] eq "ANSWER" } {
+      # Loop through each Resource Record(s).
+      foreach rr [DNS::answer] {
+        switch [DNS::type $rr] {
+          "A" {
+            # If the IP is not in the whitelist, filter the response.
+            if { ![class match [DNS::rdata $rr] equals $static::dns_response_ip4_whitelist_dg] } {
+              set threat_categories [IP::reputation [DNS::rdata $rr]]
+              # If a Threat Category is returned and matches, filter the request.
+              if { [class match $threat_categories contains $static::dns_response_ipi_categories_dg] } {
+                # Threat Category matched - Log.
+                if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: A, Threat Category: $threat_categories - Respond with NXDOMAIN" }
+                # Return NXDOMAIN to the client.
+                DNS::answer clear
+                DNS::header opcode QUERY
+                DNS::header rcode NXDOMAIN
+              }
  
-						} else {
-							# IP Whitelist matched - Log.
-							if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], IP Whitelist: Match Found - Bypass Response Filtering" }
-						}
-					}	
+            } else {
+              # IP Whitelist matched - Log.
+              if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: [DNS::question type], IP Whitelist: Match Found - Bypass Response Filtering" }
+            }
+          } 
  
-					"AAAA" {
-						# As IP::reputation doesn't support IPv6, use the Threat Category response from the A record. i.e. If the A record is bad assume the AAAA record is also bad.
-						if { [class match $threat_categories contains $static::dns_response_ipi_categories_dg] } {
-							# Threat Category matched - Log.
-							if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: AAAA, Threat Category: $threat_categories - Respond with NXDOMAIN" }
-							# Return NXDOMAIN to the client.
-							DNS::answer clear
-							DNS::header opcode QUERY
-							DNS::header rcode NXDOMAIN
-						}	
-					}
-				}
-			}
-		}
-	}
-	# Log the DNS response
-	if { $static::debug_dns >= 2 } { log local0. "Client IP: [IP::client_addr], Answer: [DNS::answer], RCODE: [DNS::header rcode]" }
+          "AAAA" {
+            # As IP::reputation doesn't support IPv6, use the Threat Category response from the A record. i.e. If the A record is bad assume the AAAA record is also bad.
+            if { [class match $threat_categories contains $static::dns_response_ipi_categories_dg] } {
+              # Threat Category matched - Log.
+              if { $static::debug_dns >= 1 } { log local0. "Client IP: [IP::client_addr], Question: [DNS::question name], Type: AAAA, Threat Category: $threat_categories - Respond with NXDOMAIN" }
+              # Return NXDOMAIN to the client.
+              DNS::answer clear
+              DNS::header opcode QUERY
+              DNS::header rcode NXDOMAIN
+            } 
+          }
+        }
+      }
+    }
+  }
+  # Log the DNS response
+  if { $static::debug_dns >= 2 } { log local0. "Client IP: [IP::client_addr], Answer: [DNS::answer], RCODE: [DNS::header rcode]" }
 }
  
 #Data Groups:
