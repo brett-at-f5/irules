@@ -16,11 +16,6 @@ when RULE_INIT {
   set static::null_ttl 30
 }
 
-when CLIENT_ACCEPTED {
-  # Save the name of the Pool attached to the Virtual Server
-  set default_pool [LB::server pool]
-}
-
 proc nxdomain {
   DNS::answer clear
   DNS::header rcode NXDOMAIN
