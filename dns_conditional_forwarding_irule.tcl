@@ -23,6 +23,13 @@ proc nxdomain {
   DNS::return
 }
 
+proc null_a {
+  DNS::header rcode NOERROR
+  DNS::header ra "1"
+  DNS::answer insert "[DNS::question name]. $static::null_ttl [DNS::question class] [DNS::question type] 0.0.0.0"
+  DNS::return
+}
+
 when DNS_REQUEST priority 200 {
   # If the Zone Name in the data group matches the Question Name, send the request to the Pool Name specified in data group
   if { [class match [DNS::question name] ends_with $static::dns_zone_pool_map_dg] } {
@@ -35,10 +42,7 @@ when DNS_REQUEST priority 200 {
       "0.0.0.0" {
         # Send a NULL response
         if { ([DNS::question type] eq "A") } {
-          DNS::header rcode NOERROR
-          DNS::header ra "1"
-          DNS::answer insert "[DNS::question name]. $static::null_ttl [DNS::question class] [DNS::question type] 0.0.0.0"
-          DNS::return
+          call null_a
         }
       }
       "NXDOMAIN" {
@@ -46,23 +50,32 @@ when DNS_REQUEST priority 200 {
         call nxdomain
       }
       "" {
-        # Do nothing - Unconditional Forward (Load Balance) to the Pool attached to the Virtual Server
+        # Unconditional Forward (Load Balance) to the Pool attached to the Virtual Server
       }
       default {
-        # Use the Pool Name value from the data group. If the Pool doesn't exist, respond with NXDOMAIN.
+        # Use the Pool Name value from the data group. If the Pool doesn't exist, respond with Null Response or NXDOMAIN.
         if { [catch {pool $dns_pool}] } {
           log local0.err "ERROR: $dns_pool doesn't exist for [DNS::question name]."
-          call nxdomain
+          if { ([DNS::question type] eq "A") } {
+            call null_a
+          } else {
+            call nxdomain
+          }
         } else {
-          # If all Pool Members are down - Conditional Forwarder is not available, respond with NXDOMAIN.
+          # If all Pool Members are down - Conditional Forwarder is not available, respond with ull Response or NXDOMAIN.
           if { [active_members $dns_pool] < 1 } {
             log local0.err "ERROR: All $dns_pool members are down for [DNS::question name]."
-            call nxdomain
+            if { ([DNS::question type] eq "A") } {
+              call null_a
+            } else {
+              call nxdomain
+            }
           } else {
+            # Conditional Forward to $dns_pool
             pool $dns_pool
           }
         }
       }
     }
-  } 
+  }
 }
