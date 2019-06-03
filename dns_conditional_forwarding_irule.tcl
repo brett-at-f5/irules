@@ -5,7 +5,7 @@
 #**  - This iRule will select a DNS server pool based on the Zone Name and forward the query.
 #**  - It also supports sending NULL DNS or NXDOMAIN response for a Zone or FQDN.
 #**  - The Pool Name is stored in data group specified in the RULE_INIT variable.
-#**  - If the Pool Members are actively monitored and marked down, a NXDOMAIN response will be sent to the client.
+#**  - If the Pool Members are actively monitored and marked down, a Null or NXDOMAIN response will be sent to the client.
 #**
 
 when RULE_INIT {
