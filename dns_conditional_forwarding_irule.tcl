@@ -79,3 +79,22 @@ when DNS_REQUEST priority 200 {
     }
   }
 }
+
+#** Example Data Group
+#**ltm data-group internal dns_zone_pool_map_dg {
+#**    records {
+#**        10.in-addr.arpa {
+#**            data f5.demo_dns_pool
+#**        }
+#**        badsite.com {
+#**            data NXDOMAIN
+#**        }
+#**        www.fakenews.com {
+#**            data 0.0.0.0
+#**        }
+#**        f5.demo {
+#**            data f5.demo_dns_pool
+#**        }
+#**    }
+#**    type string
+#**}
