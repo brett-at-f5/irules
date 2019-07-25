@@ -8,7 +8,7 @@ when DNS_REQUEST priority 100 {
   set hsl [HSL::open -publisher /Common/elk_log_pub]
 
   # Log DNS Request details
-  HSL::send $hsl "timestamp=[clock clicks -milliseconds],vs=[virtual],ptype=[DNS::ptype],origin=[DNS::origin],opcode=[DNS::header opcode],id=[DNS::header id],name=[DNS::question name],class=[DNS::question class],dns_type=[DNS::question type],cs_source_ip=[IP::client_addr],cs_source_port=[UDP::client_port],cs_dest_ip=[IP::local_addr],cs_dest_port=[UDP::local_port]"
+  HSL::send $hsl "timestamp=[clock clicks -milliseconds],vs=[virtual],ptype=[DNS::ptype],origin=[DNS::origin],opcode=[DNS::header opcode],id=[DNS::header id],name=[DNS::question name],class=[DNS::question class],dns_type=[DNS::question type],cs_source_ip=[IP::client_addr],cs_source_port=[UDP::client_port],cs_dest_ip=[clientside {IP::local_addr}],cs_dest_port=[clientside {UDP::local_port}]"
 }
 
 when DNS_RESPONSE {
