@@ -1,6 +1,7 @@
 #**
 #** Name: dns_conditional_forwarding_irule
 #** Author: brett-at-f5
+#** Version: 1.1
 #** Description:
 #**  - This iRule will select a DNS server pool based on the Zone Name and forward the query.
 #**  - It also supports sending NULL DNS or NXDOMAIN response for a Zone or FQDN.
@@ -16,14 +17,14 @@ when RULE_INIT {
   set static::null_ttl 30
 }
 
-proc nxdomain {
+proc nxdomain {  }{
   DNS::answer clear
   DNS::header rcode NXDOMAIN
   DNS::header ra "1"
   DNS::return
 }
 
-proc null_a {
+proc null_a {  } {
   DNS::header rcode NOERROR
   DNS::header ra "1"
   DNS::answer insert "[DNS::question name]. $static::null_ttl [DNS::question class] [DNS::question type] 0.0.0.0"
