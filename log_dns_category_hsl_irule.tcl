@@ -14,6 +14,7 @@ when DNS_REQUEST priority 100 {
     # Determine the URL Category for the Question Name.
     set category [lindex [CATEGORY::lookup http://[DNS::question name]] 0]
     set category [getfield $category "/" 3]
+    set category [string map {"_" " "} $category]
   }
 
   # Log DNS Request details
