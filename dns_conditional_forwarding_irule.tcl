@@ -17,7 +17,7 @@ when RULE_INIT {
   set static::null_ttl 30
 }
 
-proc nxdomain {  }{
+proc nxdomain {  } {
   DNS::answer clear
   DNS::header rcode NXDOMAIN
   DNS::header ra "1"
