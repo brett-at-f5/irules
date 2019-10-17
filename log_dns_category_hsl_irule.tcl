@@ -1,6 +1,7 @@
 #**
 #** Name: log_dns_category_hsl_irule
 #** Author: brett-at-f5
+#** Version: 1.0
 #** Description: Logs DNS Request and Responses to HSL publisher with URL and IPI Category
 #**
 
