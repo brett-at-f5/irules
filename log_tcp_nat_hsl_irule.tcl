@@ -1,6 +1,7 @@
 #**
 #** Name   : log_tcp_nat_hsl_irule
 #** Author : brett-at-f5
+#** Version: 1.0
 #** Description: Log TCP NAT connections to HSL Publisher.
 #**
 
