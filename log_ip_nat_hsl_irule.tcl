@@ -1,8 +1,8 @@
 #**
-#** Name   : log_l4_ip_nat_hsl_irule
+#** Name   : log_ip_nat_hsl_irule
 #** Author : brett-at-f5
 #** Version: 1.0
-#** Description: Log L4 IP NAT connections to HSL Publisher.
+#** Description: Log IP NAT connections to HSL Publisher.
 #**
 
 when SERVER_CONNECTED {
