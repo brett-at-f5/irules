@@ -24,8 +24,6 @@ proc log_this { log_message } {
 }
 
 when CLIENT_ACCEPTED {
-  # Default Action: Reject
-  set allow 0
   set log_prefix "[IP::client_addr]:[TCP::client_port] --> [IP::local_addr]:[TCP::local_port]"
 
   # Allow based on Source IP
