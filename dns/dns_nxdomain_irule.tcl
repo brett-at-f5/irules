@@ -12,7 +12,6 @@ when RULE_INIT {
 
 
 when DNS_REQUEST {
-
   # Debug DNS Request
   #log local0. "timestamp=[clock clicks -milliseconds],vs=\"[virtual]\",ptype=\"[DNS::ptype]\",origin=\"[DNS::origin]\",opcode=\"[DNS::header opcode]\",id=[DNS::header id],qname=\"[DNS::question name]\",class=\"[DNS::question class]\",dns_type=\"[DNS::question type]\",cs_source_ip=[IP::client_addr],cs_dest_ip=[clientside {IP::local_addr}]"
 
